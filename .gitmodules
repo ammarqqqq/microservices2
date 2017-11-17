@@ -1,0 +1,30 @@
+[submodule "userandaccountservice"]
+	path = userandaccountservice
+	url = https://github.com/fintechinnovationas/userandaccountservice.git
+[submodule "historyservice"]
+	path = historyservice
+	url = https://github.com/fintechinnovationas/historyservice.git
+[submodule "elk"]
+	path = elk
+	url = https://github.com/fintechinnovationas/elk.git
+[submodule "socketservice"]
+	path = socketservice
+	url = https://github.com/fintechinnovationas/socketservice.git
+[submodule "backofficeservice"]
+	path = backofficeservice
+	url = https://github.com/fintechinnovationas/backofficeservice.git
+[submodule "backofficeweb"]
+	path = backofficeweb
+	url = https://github.com/fintechinnovationas/backofficeweb.git
+[submodule "web"]
+	path = web
+	url = https://github.com/fintechinnovationas/web.git
+[submodule "authenticationservice"]
+	path = authenticationservice
+	url = https://github.com/fintechinnovationas/authenticationservice.git
+[submodule "transactionservice"]
+	path = transactionservice
+	url = https://github.com/fintechinnovationas/transactionservice.git
+[submodule "messageservice"]
+	path = messageservice
+	url = https://github.com/fintechinnovationas/messageservice.git

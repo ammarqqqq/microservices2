@@ -1,0 +1,181 @@
+version: '2'
+
+services:
+
+  web:
+      build: ./web
+      restart: always
+      environment:
+         SERVICE_NAME: web
+         SERVICE_TAGS: production
+         DNSDOMAIN: ${DNSDOMAIN}
+      ports:
+        - "81:443"
+      hostname: web
+      volumes:
+        - "./web/src:/data/www"
+      domainname: soci80bank.com
+
+  backofficeweb:
+    build: ./backofficeweb
+    restart: always
+    environment:
+      SERVICE_NAME: backofficeweb
+      SERVICE_TAGS: production
+      DNSDOMAIN: ${DNSDOMAIN}
+    depends_on:
+      - rabbit3
+    ports:
+      - "82:443"
+    hostname: backofficeweb
+    volumes:
+      - "./backofficeweb/src:/data/www"
+    domainname: soci80bank.com/backofficeweb
+
+  userandaccountservice:
+      build: ./userandaccountservice
+      environment:
+         SERVICE_NAME: userandaccountservice
+         SERVICE_TAGS: production
+         NODE_ENV: development
+         CONSUL_ADDRESS: consul:8500
+         TRACE_SERVICE_NAME: userandaccountservice
+         TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
+         RABBITMQ_URL: 'amqps://rabbitmq:rabbitmq@rabbit3:5671/'
+      ports:
+          - "8080"
+          - "9922"
+      restart: always
+      depends_on:
+        - userandaccountmongo
+        - userandaccountredis
+        - rabbit3
+      volumes:
+        - "./userandaccountservice/src:/src"
+
+  authenticationservice:
+    build: ./authenticationservice
+    environment:
+      SERVICE_NAME: authenticationservice
+      SERVICE_TAGS: production
+      NODE_ENV: development
+      CONSUL_ADDRESS: consul:8500
+      TRACE_SERVICE_NAME: authenticationservice
+      TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
+    ports:
+      - "8080"
+      - "9922"
+    restart: always
+    volumes:
+      - "./authenticationservice/src:/src"
+
+  socketservice:
+      build: ./socketservice
+      environment:
+         SERVICE_NAME: socketservice
+         SERVICE_TAGS: production,iphash
+         NODE_ENV: development
+         CONSUL_ADDRESS: consul:8500
+         TRACE_SERVICE_NAME: socketservice
+         TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
+      ports:
+          - "8080"
+          - "9922"
+      restart: always
+      volumes:
+        - "./socketservice/src:/src"
+
+  historyservice:
+      build: ./historyservice
+      environment:
+         SERVICE_NAME: historyservice
+         SERVICE_TAGS: production
+         NODE_ENV: development
+         CONSUL_ADDRESS: consul:8500
+         TRACE_SERVICE_NAME: historyservice
+         TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
+      volumes:
+        - "./historyservice/src:/src"
+      ports:
+          - "8080"
+          - "9922"
+      restart: always
+
+  messageservice:
+      build: ./messageservice
+      environment:
+         SERVICE_NAME: messageservice
+         SERVICE_TAGS: production
+         NODE_ENV: development
+         TRACE_SERVICE_NAME: messageservice
+         TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
+      links:
+          - messageservicemongo
+          - pushnotificationserviceredis
+      ports:
+          - "8080"
+          - "9922"
+      restart: always
+      volumes:
+         - "./messageservice/src:/src"
+
+  backofficeservice:
+      build: ./backofficeservice
+      environment:
+         SERVICE_NAME: backofficeservice
+         SERVICE_TAGS: production
+         NODE_ENV: development
+         CONSUL_ADDRESS: consul:8500
+         DNSDOMAIN: ${DNSDOMAIN}
+         TRACE_SERVICE_NAME: backofficeservice
+         TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
+         RABBITMQ_URL: 'amqps://rabbitmq:rabbitmq@rabbit3:5671/'
+      ports:
+          - "8080"
+          - "9922"
+      links:
+            - backofficemongo
+      restart: always
+      extra_hosts:
+       - "${DNSDOMAIN}:${DNSDOMAINIP}"
+      volumes:
+       - "./backofficeservice/src:/src"
+
+  backofficemongo:
+    image: mongo:latest
+    command: --smallfiles
+    restart: always
+
+  backofficetokenredis:
+      image: redis
+      restart: always
+      ports:
+        - "6379"
+      environment:
+         SERVICE_NAME: backofficetokenredis
+         SERVICE_TAGS: production
+
+  transactionservice:
+    build: ./transactionservice
+    environment:
+        SERVICE_NAME: transactionservice
+        SERVICE_TAGS: production
+        NODE_ENV: development
+        CONSUL_ADDRESS: consul:8500
+        TRACE_SERVICE_NAME: transactionservice
+        TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
+    ports:
+        - "8080"
+        - "9922"
+    restart: always
+    volumes:
+      - "./transactionservice/src:/src"
+
+  transactionmongo:
+    image: mongo:latest
+    command: --smallfiles
+    restart: always
+
+  transactionredis:
+    image: redis
+    restart: always

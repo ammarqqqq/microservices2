@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+  userandaccountservice:
+      build: ./userandaccountservice
+      environment:
+         SERVICE_NAME: userandaccountservice
+         SERVICE_TAGS: production
+         NODE_ENV: development
+         DNSDOMAIN: ${DNSDOMAIN}
+      links:
+          - userandaccountmongo
+          - userandaccountredis
+      ports:
+          - "8080"
+      restart: always
+      extra_hosts:
+       - "${DNSDOMAIN}:${DNSDOMAINIP}"
+
+  web:
+    build: ./web
+    restart: always
+    environment:
+       SERVICE_NAME: web
+       SERVICE_TAGS: production
+       DNSDOMAIN: ${DNSDOMAIN}
+    ports:
+      - "80:443"
+    hostname: web
+    domainname: sosi80bank.com
+
+  authenticationservice:
+    build: ./authenticationservice
+    environment:
+       SERVICE_NAME: authenticationservice
+       SERVICE_TAGS: production
+       NODE_ENV: development
+       DNSDOMAIN: ${DNSDOMAIN}
+    ports:
+        - "8080"
+        - "9922"
+    restart: always
+    extra_hosts:
+     - "${DNSDOMAIN}:${DNSDOMAINIP}"

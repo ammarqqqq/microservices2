@@ -1,0 +1,87 @@
+version: '2'
+
+services:
+  bootstrap:
+    build:  ./eth-geth-client
+    restart: on-failure
+    container_name: bootstrap
+    hostname: bootstrap
+    domainname: soci80bank.com
+    environment:
+        SERVICE_NAME: ethereum
+        SERVICE_TAGS: production
+        NODE_ENV:   development
+        CONSUL_ADDRESS: consul:8500
+    links:
+      - netstats
+    entrypoint: /root/start.sh
+    command: '--datadir=~/.ethereum/devchain/ --nodekeyhex=091bd6067cb4612df85d9c1ff85cc47f259ced4d4cd99816b14f35650f59c322   --rpcapi="db,personal,eth,net,web3,shh,txpool,admin,miner,debug" --rpccorsdomain="*" --networkid=456719 --rpc  --rpcport="8545" --rpcaddr="0.0.0.0" --wsport="8546" --maxpeers 100 --nat "any"  --mine --minerthreads 8'
+    volumes:
+      - "./eth-geth-client/BlockchainEthereumFiles2/password:/root/BlockchainEthereumFiles2/password:ro"
+      - "./eth-geth-client/BlockchainEthereumFiles2/genesis.json:/root/BlockchainEthereumFiles2/genesis.json:ro"
+      - "./eth-geth-client/BlockchainEthereumFiles2/keystore:/root/.ethereum/devchain/keystore:rw"
+      - "/etc/localtime:/etc/localtime"
+
+
+  ethereum:
+    build:  ./eth-geth-client
+    restart: on-failure
+    hostname: ethereum
+    domainname: soci80bank.com
+    environment:
+        SERVICE_NAME: ethereum
+        SERVICE_TAGS: production
+        NODE_ENV:  development
+        CONSUL_ADDRESS: consul:8500
+    links:
+      - bootstrap
+      - netstats
+    entrypoint: /root/start.sh
+    command: '--datadir=~/.ethereum/devchain/ --rpccorsdomain="*" --networkid=456719 --rpcapi="db,personal,eth,net,web3,shh,txpool,admin,miner,debug" --rpc  --rpcaddr "0.0.0.0" --rpcport="8545"  --maxpeers 100 --nat "any"   --mine --minerthreads 8 --bootnodes="enode://288b97262895b1c7ec61cf314c2e2004407d0a5dc77566877aad1f2a36659c8b698f4b56fd06c4a0c0bf007b4cfb3e7122d907da3b005fa90e724441902eb19e@XXX:30303"'
+    volumes:
+      - "./eth-geth-client/BlockchainEthereumFiles2/password:/root/BlockchainEthereumFiles2/password:ro"
+      - "./eth-geth-client/BlockchainEthereumFiles2/genesis.json:/root/BlockchainEthereumFiles2/genesis.json:ro"
+      - "./eth-geth-client/BlockchainEthereumFiles2/keystore:/root/.ethereum/devchain/keystore:rw"
+      - "/etc/localtime:/etc/localtime"
+    ports:
+      - "30303"
+      - "30303/udp"
+      - "8545"
+
+  netstats:
+    build: ./eth-netstats
+    restart: on-failure
+    container_name: netstats
+    environment:
+      WS_SECRET: eth-net-stats-secret
+      SERVICE_NAME: netstats
+      SERVICE_TAGS: production
+      NODE_ENV:  development
+      CONSUL_ADDRESS: consul:8500
+    volumes:
+      - /etc/localtime:/etc/localtime
+    ports:
+      - "3000"
+
+  #transactionservice:
+  #  build: ./transactionservice
+  #  environment:
+  #    SERVICE_NAME: transactionservice
+  #    SERVICE_TAGS: production
+  #    NODE_ENV: development
+  #    CONSUL_ADDRESS: consul:8500
+  #    TRACE_SERVICE_NAME: transactionservice
+  #    TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
+  #  ports:
+  #    - "8080"
+  #    - "9922"
+  #  restart: always
+
+  #transactionmongo:
+  #  image: mongo:latest
+  #  command: --smallfiles
+  #  restart: always
+
+  #transactionredis:
+  #  image: redis
+  #  restart: always
