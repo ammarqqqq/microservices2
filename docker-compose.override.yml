@@ -23,8 +23,8 @@ services:
       SERVICE_NAME: backofficeweb
       SERVICE_TAGS: production
       DNSDOMAIN: ${DNSDOMAIN}
-    depends_on:
-      - rabbit3
+    #depends_on:
+    #  - rabbit3
     ports:
       - "82:443"
     hostname: backofficeweb
@@ -41,7 +41,7 @@ services:
          CONSUL_ADDRESS: consul:8500
          TRACE_SERVICE_NAME: userandaccountservice
          TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
-         RABBITMQ_URL: 'amqps://rabbitmq:rabbitmq@rabbit3:5671/'
+         #RABBITMQ_URL: 'amqps://rabbitmq:rabbitmq@rabbit3:5671/'
       ports:
           - "8080"
           - "9922"
@@ -49,7 +49,7 @@ services:
       depends_on:
         - userandaccountmongo
         - userandaccountredis
-        - rabbit3
+        #- rabbit3
       volumes:
         - "./userandaccountservice/src:/src"
 
@@ -129,7 +129,7 @@ services:
          DNSDOMAIN: ${DNSDOMAIN}
          TRACE_SERVICE_NAME: backofficeservice
          TRACE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NmY0ZDE1ZTg2OTYyMzg2NzA0NTEwOSIsImlhdCI6MTUwMDQ2NjQ1M30.r6BHvTt3RCkYsTe_U36lAED_t8xtJRKFFEgVAkN8jNE
-         RABBITMQ_URL: 'amqps://rabbitmq:rabbitmq@rabbit3:5671/'
+         #RABBITMQ_URL: 'amqps://rabbitmq:rabbitmq@rabbit3:5671/'
       ports:
           - "8080"
           - "9922"
