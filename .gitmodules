@@ -28,3 +28,6 @@
 [submodule "messageservice"]
 	path = messageservice
 	url = https://github.com/fintechinnovationas/messageservice.git
+[submodule "rabbitmq"]
+       path= rabbitmq
+       url= https://github.com/fintechinnovationas/rabbitmq.git
