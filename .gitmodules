@@ -31,3 +31,6 @@
 [submodule "rabbitmq"]
        path= rabbitmq
        url= https://github.com/fintechinnovationas/rabbitmq.git
+[submodule "lb_org"]
+	path = lb_org
+	url = https://github.com/fintechinnovationas/lb_org.git
