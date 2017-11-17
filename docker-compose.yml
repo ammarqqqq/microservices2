@@ -4,7 +4,7 @@ services:
 
   consul:
     #command: -server -advertise 172.17.0.1 -bootstrap
-    command:  -retry-join 52.57.99.89  -retry-join 35.197.251.183  -retry-join 52.48.82.32  -advertise 35.195.204.22
+    command: consul agent  bind  -retry-join 52.57.99.89  -retry-join 35.197.251.183  -retry-join 52.48.82.32  -advertise 35.157.178.106
     image: progrium/consul:latest
     ports:
      - "8500:8500"
